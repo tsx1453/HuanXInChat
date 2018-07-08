@@ -37,6 +37,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private Context mContext;
     private String username;
     private Handler mHadler;
+    private EMConversation conversation;
 
     public ChatRecyclerAdapter(Context mContext, String username) {
         this.mContext = mContext;
@@ -114,7 +115,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         new Thread(new Runnable() {
             @Override
             public void run() {
-                EMConversation conversation = EMClient.getInstance().chatManager().getConversation(username,null,true);
+                conversation = EMClient.getInstance().chatManager().getConversation(username,null,true);
 //                Log.d("lalala", "run: "+(conversation==null));
                 final List<EMMessage> list = conversation.getAllMessages();
                 mHadler.post(new Runnable() {
