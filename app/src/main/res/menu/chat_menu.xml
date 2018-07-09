@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/chat_menu_time"
+        app:showAsAction="never"
+        android:orderInCategory="100"
+        android:title="时间显示(开，guan)"/>
+
+    <item android:id="@+id/chat_menu_back"
+        app:showAsAction="never"
+        android:title="@string/chat_menu_back_choose"
+        android:orderInCategory="200"/>
+
+    <item android:id="@+id/chat_menu_user"
+        app:showAsAction="always"
+        android:title="user"
+        android:icon="@drawable/ic_person_outline_black_24dp"/>
+
+</menu>

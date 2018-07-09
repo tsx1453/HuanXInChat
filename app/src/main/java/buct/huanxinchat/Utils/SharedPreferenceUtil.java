@@ -29,4 +29,25 @@ public class SharedPreferenceUtil {
         editor.putBoolean(LOGINSTATE, state);
         editor.commit();
     }
+
+    public static boolean getChatTimeShow(Context context, String user) {
+        return getSP(context).getBoolean(user + "time", false);
+    }
+
+    public static void setChatTimeShow(Context context, String user, Boolean isShow) {
+        SharedPreferences.Editor editor = getEditor(context);
+        editor.putBoolean(user + "time", isShow);
+        editor.commit();
+    }
+
+    public static String getChatbackGround(Context context, String user) {
+        return getSP(context).getString(user + "back", null);
+    }
+
+    public static void setBackGround(Context context, String user, String path) {
+        SharedPreferences.Editor editor = getEditor(context);
+        editor.putString(user + "back", path);
+        editor.commit();
+    }
+
 }
