@@ -355,6 +355,9 @@ public class ChatActivity extends BaseActivity {
 //        Log.d("tsxmylog", "onActivityResult: " + requestCode + ":" + requestCode);
         switch (requestCode) {
             case CHOOSE_PHOTO_FOR_BACKGROUND:
+                if (data.getData()==null){
+                    return;
+                }
                 setBackGround(handleImagePath(data.getData()));
                 break;
             case CHOOSE_PHOTO_FOR_SEND:

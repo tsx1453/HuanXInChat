@@ -7,6 +7,7 @@ import android.graphics.Matrix;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +46,10 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private Handler mHadler;
     private EMConversation conversation;
     private RecyclerView recyclerView;
+    private TextView loadingView;
+    private boolean isNewConversation = false;
+    private boolean isLoadingData = false;
+    private boolean noMoreData = false;
 
     public ChatRecyclerAdapter(Context mContext, String username) {
         this.mContext = mContext;
@@ -89,7 +94,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0) {
+        if (position == 0 && isNewConversation == false) {
             return TYPE_MORE;
         }
         switch (messages.get(position).getType()) {
@@ -209,13 +214,14 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         public MoreViewHolder(View itemView) {
             super(itemView);
             loadImg = (TextView) itemView;
+            loadingView = loadImg;
         }
     }
 
     private void bindMoreViewHolder(MoreViewHolder holder) {
         holder.loadImg.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 200));
         holder.loadImg.setGravity(Gravity.CENTER);
-        holder.loadImg.setText("loading...");
+//        holder.loadImg.setText("loading...");
         loadData();
     }
 
@@ -238,31 +244,27 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     private void loadData() {
+        if (isLoadingData || noMoreData) {
+            return;
+        }
+        isLoadingData = true;
         new Thread(new Runnable() {
             @Override
             public void run() {
-                conversation = EMClient.getInstance().chatManager().getConversation(username, null, true);
+                conversation = EMClient.getInstance().chatManager().getConversation(username, EMConversation.EMConversationType.Chat, true);
 //                Log.d("lalala", "run: "+(conversation==null));
                 final EMMessage message;
                 final boolean scroll;
                 if (messages.size() == 0) {
+                    message = conversation.getLastMessage();
+                    if (message == null) {
+                        isNewConversation = true;
+                        return;
+                    }
+                    isNewConversation = false;
                     messages.add(null);
                     scroll = true;
-                    message = conversation.getLastMessage();
                     messages.add(1, message);
-//                    mHadler.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            if (message == null) {
-//                                return;
-//                            }
-////                        Log.d("tsxmylog", "run: "+conversation.loadMoreMsgFromDB(list.get(0).getMsgId(),10));
-//
-//                            messages.addAll(0, conversation.loadMoreMsgFromDB(message.getMsgId(), 20));
-//                            ChatRecyclerAdapter.this.notifyItemInserted(messages.size());
-//                            recyclerView.scrollToPosition(getItemCount() - 1);
-//                        }
-//                    });
                 } else {
                     message = messages.get(1);
                     scroll = false;
@@ -270,11 +272,21 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 mHadler.post(new Runnable() {
                     @Override
                     public void run() {
+                        int size = messages.size();
                         messages.addAll(1, conversation.loadMoreMsgFromDB(message.getMsgId(), 20));
+                        if (messages.size() > size && loadingView != null) {
+                            loadingView.setText("loading...");
+                            noMoreData = false;
+                        } else if (loadingView != null) {
+                            loadingView.setText("no more data");
+                            noMoreData = true;
+                            Log.d("tsxmylog", "run: nodata");
+                        }
                         ChatRecyclerAdapter.this.notifyDataSetChanged();
                         if (scroll) {
                             recyclerView.scrollToPosition(getItemCount() - 1);
                         }
+                        isLoadingData = false;
                     }
                 });
             }
