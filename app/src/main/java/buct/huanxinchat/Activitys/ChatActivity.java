@@ -28,6 +28,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -352,7 +353,10 @@ public class ChatActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        Log.d("tsxmylog", "onActivityResult: " + requestCode + ":" + requestCode);
+//        Log.d("tsxmylog", "onActivityResult: " + requestCode + ":" + resultCode);
+        if (resultCode != RESULT_OK){
+            return;
+        }
         switch (requestCode) {
             case CHOOSE_PHOTO_FOR_BACKGROUND:
                 if (data.getData()==null){
