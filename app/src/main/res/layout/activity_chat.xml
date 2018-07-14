@@ -2,84 +2,108 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/chat_root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/chat_root_view"
     android:background="#d0d0d0"
     tools:context="buct.huanxinchat.Activitys.ChatActivity">
 
     <ImageView
+        android:id="@+id/chat_background"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:id="@+id/chat_background"
         android:scaleType="centerCrop"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        tools:background="#123"/>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="#123" />
 
     <LinearLayout
+        android:id="@+id/chat_edit_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/chat_edit_area"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@id/more_area"
         android:background="#ffffff"
-        android:gravity="center">
-
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            android:id="@+id/chat_input"
-            android:background="@null"/>
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/more_area">
 
         <Button
+            android:id="@+id/recoder_btn"
             android:layout_width="35dp"
             android:layout_height="35dp"
+            android:background="@drawable/ic_record_voice_over_black_24dp"
+            android:backgroundTint="#7c7c7c" />
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <EditText
+                android:id="@+id/chat_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="@null"
+                android:layout_margin="1dp"
+                android:paddingLeft="2dp"/>
+
+            <buct.huanxinchat.Views.AudioRecoderButton
+                android:id="@+id/record_button"
+                android:layout_width="match_parent"
+                android:layout_height="33dp"
+                android:layout_margin="1dp"
+                android:visibility="gone"
+                android:text="@string/str_recorder_normal"
+                android:background="@drawable/record_btn_back"/>
+
+        </FrameLayout>
+
+        <Button
             android:id="@+id/chat_send_btn"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_gravity="bottom"
-            android:backgroundTint="#7c7c7c"
-            android:background="@drawable/ic_add_circle_outline_black_24dp" />
+            android:background="@drawable/ic_add_circle_outline_black_24dp"
+            android:backgroundTint="#7c7c7c" />
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/more_area"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:id="@+id/more_area"
         android:background="#fff"
-        android:orientation="horizontal"
         android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         tools:layout_height="200dp">
 
         <ImageView
+            android:id="@+id/more_picture"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:id="@+id/more_picture"
             android:src="@drawable/ic_photo_black_24dp" />
 
         <ImageView
+            android:id="@+id/more_carema"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:id="@+id/more_carema"
-            android:src="@drawable/ic_photo_camera_black_24dp"/>
+            android:src="@drawable/ic_photo_camera_black_24dp" />
 
     </LinearLayout>
 
 
     <android.support.v7.widget.RecyclerView
+        android:id="@+id/chat_recycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:id="@+id/chat_recycler"
+        app:layout_constraintBottom_toTopOf="@+id/chat_edit_area"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/chat_edit_area"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

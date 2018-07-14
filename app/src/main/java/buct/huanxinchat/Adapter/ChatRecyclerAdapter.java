@@ -3,7 +3,9 @@ package buct.huanxinchat.Adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -12,6 +14,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +25,7 @@ import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMImageMessageBody;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMTextMessageBody;
+import com.hyphenate.chat.EMVoiceMessageBody;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,6 +33,8 @@ import java.util.Date;
 import java.util.List;
 
 import buct.huanxinchat.R;
+import buct.huanxinchat.Utils.MediaManager;
+import buct.huanxinchat.Utils.PictureDialog;
 import buct.huanxinchat.Utils.SharedPreferenceUtil;
 
 /**
@@ -39,6 +46,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private final static int TYPE_TXT = 0;
     private final static int TYPE_IMAGE = 1;
     private final static int TYPE_MORE = 2;
+    private final static int TYPE_VOICE = 3;
 
     private List<EMMessage> messages;
     private Context mContext;
@@ -71,12 +79,17 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             case TYPE_IMAGE:
                 bindPicViewHoler((PicViewHoler) holder, position);
                 break;
+            case TYPE_VOICE:
+                bindVoiceViewHolder((VoiceViewHolder) holder, position);
+                break;
         }
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
+            case TYPE_VOICE:
+                return new VoiceViewHolder(LayoutInflater.from(mContext).inflate(R.layout.voice_item_layout, parent, false));
             case TYPE_MORE:
                 return new MoreViewHolder(new TextView(mContext));
             case TYPE_IMAGE:
@@ -102,6 +115,8 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 return TYPE_TXT;
             case IMAGE:
                 return TYPE_IMAGE;
+            case VOICE:
+                return TYPE_VOICE;
         }
         return TYPE_TXT;
     }
@@ -225,12 +240,86 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         loadData();
     }
 
-    private void loadImg(ImageView view, String path) {
+    private class VoiceViewHolder extends RecyclerView.ViewHolder {
+
+        ImageView headImgLeft;
+        ImageView headImgRight;
+        TextView timeLeft;
+        TextView timeRight;
+        ImageView leftContent;
+        ImageView rightContent;
+        View left;
+        View right;
+
+        public VoiceViewHolder(View itemView) {
+            super(itemView);
+            headImgRight = itemView.findViewById(R.id.chat_item_head_img_right);
+            left = itemView.findViewById(R.id.chat_item_left);
+            headImgLeft = itemView.findViewById(R.id.chat_item_head_img_left);
+            right = itemView.findViewById(R.id.chat_item_right);
+            timeLeft = itemView.findViewById(R.id.message_time_left);
+            timeRight = itemView.findViewById(R.id.message_time_right);
+            leftContent = itemView.findViewById(R.id.chat_item_content_left);
+            rightContent = itemView.findViewById(R.id.chat_item_content_right);
+        }
+    }
+
+    private void bindVoiceViewHolder(VoiceViewHolder holder, int position) {
+        EMMessage emMessage = messages.get(position);
+        EMVoiceMessageBody body = (EMVoiceMessageBody) emMessage.getBody();
+        boolean flag = TextUtils.equals(emMessage.getTo(), username);
+        int length = body.getLength();
+        if (flag) {
+            holder.left.setVisibility(View.GONE);
+            holder.timeRight.setText(String.valueOf(length));
+            setVoiceClickEvent(holder.right, body, true,holder.rightContent);
+            holder.rightContent.getLayoutParams().width = length * 100 > 800 ? 800 : length * 100;
+//            Log.d("tsx-mylog", "ChatRecyclerAdapter->bindVoiceViewHolder: "+holder.rightContent.getWidth()+":"+holder.rightContent.getLayoutParams().width);
+        } else {
+            holder.right.setVisibility(View.GONE);
+            holder.timeLeft.setText(String.valueOf(length));
+            setVoiceClickEvent(holder.left, body, false,holder.leftContent);
+            holder.leftContent.getLayoutParams().width = length * 100 > 800 ? 800 : length * 100;
+        }
+    }
+
+    private void setVoiceClickEvent(View view, final EMVoiceMessageBody body, final boolean isSelf, final ImageView imageView) {
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String url = "";
+                if (isSelf) {
+                    url = body.getLocalUrl();
+                } else {
+                    url = body.getRemoteUrl();
+                }
+                final AlphaAnimation alphaAnimation = new AlphaAnimation(1,0.3f);
+                alphaAnimation.setDuration(500);
+                alphaAnimation.setRepeatCount(-1);
+                alphaAnimation.setRepeatMode(Animation.REVERSE);
+                imageView.startAnimation(alphaAnimation);
+                MediaManager.playSound(url, new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mediaPlayer) {
+                        imageView.clearAnimation();
+                    }
+                });
+            }
+        });
+    }
+
+    private void loadImg(ImageView view, final String path) {
         Glide.with(mContext)
                 .load(path)
                 .override(800, 600)
                 .placeholder(R.drawable.ic_launcher_background)
                 .into(view);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new PictureDialog(mContext).show(path);
+            }
+        });
     }
 
     private Bitmap loadBitmap(String path) {

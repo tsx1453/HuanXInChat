@@ -52,7 +52,9 @@ import java.util.List;
 
 import buct.huanxinchat.Adapter.ChatRecyclerAdapter;
 import buct.huanxinchat.R;
+import buct.huanxinchat.Utils.MediaManager;
 import buct.huanxinchat.Utils.SharedPreferenceUtil;
+import buct.huanxinchat.Views.AudioRecoderButton;
 
 public class ChatActivity extends BaseActivity {
 
@@ -71,6 +73,8 @@ public class ChatActivity extends BaseActivity {
     private View moreArea;
     private ImageView pictureBtn;
     private ImageView cameraBtn;
+    private AudioRecoderButton recoderButton;
+    private Button recoderStartBtn;
     private boolean keyboardhasopend = false;
     private boolean hasBackGround = false;
     private int statusHeight = 0;
@@ -95,6 +99,7 @@ public class ChatActivity extends BaseActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.show();
         actionBar.setDisplayHomeAsUpEnabled(true);
+        recoderStartBtn = findViewById(R.id.recoder_btn);
         editText = findViewById(R.id.chat_input);
         sendBtn = findViewById(R.id.chat_send_btn);
         recyclerView = findViewById(R.id.chat_recycler);
@@ -103,6 +108,7 @@ public class ChatActivity extends BaseActivity {
         moreArea = findViewById(R.id.more_area);
         pictureBtn = findViewById(R.id.more_picture);
         cameraBtn = findViewById(R.id.more_carema);
+        recoderButton = findViewById(R.id.record_button);
         setBackGround(SharedPreferenceUtil.getChatbackGround(this, chatUserId));
     }
 
@@ -139,6 +145,14 @@ public class ChatActivity extends BaseActivity {
                 SharedPreferenceUtil.setChatTimeShow(ChatActivity.this, chatUserId, !SharedPreferenceUtil.getChatTimeShow(ChatActivity.this, chatUserId));
                 adapter.notifyDataSetChanged();
                 changeMenuTime(item);
+                break;
+            case android.R.id.home:
+                try {
+                    MediaManager.pause();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                finish();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -231,12 +245,7 @@ public class ChatActivity extends BaseActivity {
                     if (moreArea.getHeight() > 0) {
                         hideMoreArea();
                     } else {
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        if (imm.isActive() && getCurrentFocus() != null) {
-                            if (getCurrentFocus().getWindowToken() != null) {
-                                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                            }
-                        }
+                        hideKeyBoard();
                         showMoreArea();
                     }
                 }
@@ -316,14 +325,46 @@ public class ChatActivity extends BaseActivity {
                 openCamera();
             }
         });
+        recoderButton.setAudioFinishRecorderListener(new AudioRecoderButton.AudioFinishRecorderListener() {
+            @Override
+            public void onFinish(float seconds, String filePath) {
+                EMMessage message = EMMessage.createVoiceSendMessage(filePath, (int) seconds, chatUserId);
+                EMClient.getInstance().chatManager().sendMessage(message);
+                adapter.insertMessage(message);
+            }
+        });
+        recoderStartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(ChatActivity.this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA}, 1);
+                    return;
+                }
+                if (recoderButton.getVisibility() == View.GONE) {
+                    recoderButton.setVisibility(View.VISIBLE);
+                    hideKeyBoard();
+                } else {
+                    recoderButton.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
-    private void hideMoreArea(){
+    private void hideKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm.isActive() && getCurrentFocus() != null) {
+            if (getCurrentFocus().getWindowToken() != null) {
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            }
+        }
+    }
+
+    private void hideMoreArea() {
         moreAreaViewHeight(moreArea.getHeight(), 0);
         roateMoreBtn(45, 0);
     }
 
-    private void showMoreArea(){
+    private void showMoreArea() {
         roateMoreBtn(0, 45);
         moreAreaViewHeight(0, 400);
     }
@@ -341,7 +382,7 @@ public class ChatActivity extends BaseActivity {
 
     private void openAlbum(int requestId) {
         if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(ChatActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.CAMERA}, 1);
+            ActivityCompat.requestPermissions(ChatActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
         } else {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("image/*");
@@ -350,16 +391,15 @@ public class ChatActivity extends BaseActivity {
     }
 
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 //        Log.d("tsxmylog", "onActivityResult: " + requestCode + ":" + resultCode);
-        if (resultCode != RESULT_OK){
+        if (resultCode != RESULT_OK) {
             return;
         }
         switch (requestCode) {
             case CHOOSE_PHOTO_FOR_BACKGROUND:
-                if (data.getData()==null){
+                if (data.getData() == null) {
                     return;
                 }
                 setBackGround(handleImagePath(data.getData()));
@@ -495,4 +535,9 @@ public class ChatActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        MediaManager.pause();
+        super.onBackPressed();
+    }
 }

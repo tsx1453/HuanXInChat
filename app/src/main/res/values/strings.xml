@@ -22,4 +22,13 @@
     <string name="chat_menu_time_show">消息时间（显示）</string>
     <string name="chat_nemu_time_unshow">消息时间（隐藏）</string>
     <string name="chat_menu_back_choose">选择/清空背景</string>
+
+    <string name="str_recorder_normal">按住说话</string>
+    <string name="str_recorder_recording">松开结束</string>
+    <string name="str_recorder_want_cancel">松开手指，取消发送</string>
+
+    <string name="encode_qrcode">生成二维码</string>
+    <string name="dencode_qrcode">扫描二维码</string>
+    <string name="code_text">请输入生成二维码的文本信息</string>
+    <string name="qrcodetext">这里显示扫描结果</string>
 </resources>
