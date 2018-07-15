@@ -48,4 +48,10 @@
         <item name="android:windowExitAnimation">@anim/dialog_hide_animation</item>
     </style>
 
+    <style name="AppTheme.NoActionBarWithBackGround">
+        <item name="windowActionBar">false</item>//取消Actionbar
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
 </resources>

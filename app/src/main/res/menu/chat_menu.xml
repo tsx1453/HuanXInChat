@@ -5,7 +5,7 @@
     <item android:id="@+id/chat_menu_time"
         app:showAsAction="never"
         android:orderInCategory="100"
-        android:title="时间显示(开，guan)"/>
+        android:title="@string/chat_menu_time_show"/>
 
     <item android:id="@+id/chat_menu_back"
         app:showAsAction="never"
@@ -16,5 +16,9 @@
         app:showAsAction="always"
         android:title="user"
         android:icon="@drawable/ic_person_outline_black_24dp"/>
+
+    <item android:id="@+id/chat_menu_auto_bg"
+        android:title="@string/autobg_on"
+        android:orderInCategory="888"/>
 
 </menu>

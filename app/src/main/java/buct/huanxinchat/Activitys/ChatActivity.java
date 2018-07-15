@@ -41,6 +41,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
@@ -111,7 +112,20 @@ public class ChatActivity extends BaseActivity {
         pictureBtn = findViewById(R.id.more_picture);
         cameraBtn = findViewById(R.id.more_carema);
         recoderButton = findViewById(R.id.record_button);
-        setBackGround(SharedPreferenceUtil.getChatbackGround(this, chatUserId));
+        if (SharedPreferenceUtil.getAutoBg(this, chatUserId)) {
+            loadAutoBg();
+            hasBackGround = true;
+        } else {
+            setBackGround(SharedPreferenceUtil.getChatbackGround(this, chatUserId));
+        }
+    }
+
+    private void loadAutoBg() {
+        hasBackGround = true;
+        Glide.with(this)
+                .load("http://www.nanbaolongbao.com/background.png")
+                .placeholder(null)
+                .into(backGround);
     }
 
     @Override
@@ -134,11 +148,12 @@ public class ChatActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.chat_menu_user:
-                Toast.makeText(ChatActivity.this, "wait for finish", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ChatActivity.this, "emmm...", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.chat_menu_back:
                 if (hasBackGround) {
                     setBackGround(null);
+                    SharedPreferenceUtil.setAutoBg(this, chatUserId, false);
                 } else {
                     openAlbum(CHOOSE_PHOTO_FOR_BACKGROUND);
                 }
@@ -155,6 +170,17 @@ public class ChatActivity extends BaseActivity {
                     e.printStackTrace();
                 }
                 finish();
+                break;
+            case R.id.chat_menu_auto_bg:
+                if (SharedPreferenceUtil.getAutoBg(this, chatUserId)) {
+                    item.setTitle(R.string.autobg_off);
+                    SharedPreferenceUtil.setAutoBg(this, chatUserId, false);
+                    setBackGround(null);
+                } else {
+                    SharedPreferenceUtil.setAutoBg(this, chatUserId, true);
+                    item.setTitle(R.string.autobg_on);
+                    loadAutoBg();
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -553,9 +579,9 @@ public class ChatActivity extends BaseActivity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        RecyclerViewWithContextMenu.RecyclerViewContextInfo info = (RecyclerViewWithContextMenu.RecyclerViewContextInfo)item.getMenuInfo();
-        if (info!=null && info.getPosition()!=-1){
-            switch (item.getItemId()){
+        RecyclerViewWithContextMenu.RecyclerViewContextInfo info = (RecyclerViewWithContextMenu.RecyclerViewContextInfo) item.getMenuInfo();
+        if (info != null && info.getPosition() != -1) {
+            switch (item.getItemId()) {
                 case 1:
                     adapter.copy(info.getPosition());
                     break;
