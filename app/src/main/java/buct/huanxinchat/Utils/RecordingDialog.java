@@ -32,11 +32,9 @@ public class RecordingDialog {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view=inflater.inflate(R.layout.dialog_recorder,null);
         mDialog.setContentView(view);
-
         mIcon = view.findViewById(R.id.id_recorder_dialog_icon);
         mVoice = view.findViewById(R.id.id_recorder_dialog_voice);
         mLable = view.findViewById(R.id.id_recorder_dialog_label);
-
         mDialog.show();
     }
 
@@ -46,7 +44,6 @@ public class RecordingDialog {
             mIcon.setVisibility(View.VISIBLE);
             mVoice.setVisibility(View.VISIBLE);
             mLable.setVisibility(View.VISIBLE);
-
             mIcon.setImageResource(R.drawable.ic_record_voice_over_black_24dp);
             mLable.setText("手指上划，取消发送");
         }

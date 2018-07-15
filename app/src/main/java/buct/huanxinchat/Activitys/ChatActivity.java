@@ -261,6 +261,9 @@ public class ChatActivity extends BaseActivity {
     }
 
     private void initEvent() {
+        if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(ChatActivity.this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -364,10 +367,6 @@ public class ChatActivity extends BaseActivity {
         recoderStartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(ChatActivity.this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA}, 1);
-                    return;
-                }
                 if (recoderButton.getVisibility() == View.GONE) {
                     recoderButton.setVisibility(View.VISIBLE);
                     hideKeyBoard();
@@ -592,4 +591,7 @@ public class ChatActivity extends BaseActivity {
         }
         return super.onContextItemSelected(item);
     }
+
+
+
 }

@@ -103,7 +103,16 @@ public class AudioManager {
     }
 
     public void release() {
-        mMediaRecorder.stop();
+        try {
+            mMediaRecorder.setOnErrorListener(null);
+            mMediaRecorder.setOnInfoListener(null);
+            mMediaRecorder.setPreviewDisplay(null);
+            mMediaRecorder.stop();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            mMediaRecorder = null;
+            mMediaRecorder = new MediaRecorder();
+        }
         mMediaRecorder.release();
         mMediaRecorder = null;
     }
