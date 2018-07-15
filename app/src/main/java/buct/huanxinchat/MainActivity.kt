@@ -1,29 +1,35 @@
 package buct.huanxinchat
 
+import android.Manifest
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import buct.huanxinchat.Activitys.BaseActivity
 import buct.huanxinchat.Adapter.ContractRecyclerViewAdapter
-import buct.huanxinchat.Fragments.ContractFragment
+//import buct.huanxinchat.Adapter.ContractRecyclerViewAdapter
+//import buct.huanxinchat.Fragments.ContractFragment
 import buct.huanxinchat.Utils.QRCodeUtil
 import com.google.zxing.activity.CaptureActivity
 import com.hyphenate.chat.EMClient
 
 class MainActivity : BaseActivity(), MainActivityConstract.View {
 
-    private var adapter: ContractRecyclerViewAdapter? = null
+    //    private var adapter: ContractRecyclerViewAdapter? = null
     private var recyclerView: RecyclerView? = null
     private var qrCodeShow: Button? = null
     private var qrCodeScan: Button? = null
@@ -36,21 +42,17 @@ class MainActivity : BaseActivity(), MainActivityConstract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.fragment_contract)
         initView()
     }
 
     private fun initView() {
-        supportFragmentManager.beginTransaction().add(R.id.frag_container, ContractFragment.newInstance()).commit()
-    }
-
-    private fun initView(view: View) {
-        recyclerView = view.findViewById<RecyclerView>(R.id.contract_recycler)
-        qrCodeScan = view.findViewById<Button>(R.id.qr_scan)
-        qrCodeShow = view.findViewById<Button>(R.id.qr_code_show)
+        recyclerView = findViewById<RecyclerView>(R.id.contract_recycler)
+        qrCodeScan = findViewById<Button>(R.id.qr_scan)
+        qrCodeShow = findViewById<Button>(R.id.qr_code_show)
         recyclerView!!.setLayoutManager(LinearLayoutManager(this))
-        adapter = ContractRecyclerViewAdapter(this)
-        recyclerView!!.setAdapter(adapter)
+        recyclerView!!.adapter = ContractRecyclerViewAdapter(this)
+        recyclerView!!.layoutAnimation = AnimationUtils.loadLayoutAnimation(this,R.anim.layout_falldown)
         qrCodeShow!!.setOnClickListener(View.OnClickListener {
             val bitmap = QRCodeUtil.createQRCodeBitmap(EMClient.getInstance().currentUser, 600, 600)
             val dialog = Dialog(this, R.style.Theme_PicDialog)
@@ -63,6 +65,8 @@ class MainActivity : BaseActivity(), MainActivityConstract.View {
             dialog.show()
         })
         qrCodeScan!!.setOnClickListener(View.OnClickListener {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+                run { ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 1) }
             val intent = Intent(this, CaptureActivity::class.java)
             startActivityForResult(intent, 99)
         })

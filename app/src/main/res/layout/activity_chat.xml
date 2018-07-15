@@ -97,7 +97,7 @@
     </LinearLayout>
 
 
-    <android.support.v7.widget.RecyclerView
+    <buct.huanxinchat.Views.RecyclerViewWithContextMenu
         android:id="@+id/chat_recycler"
         android:layout_width="0dp"
         android:layout_height="0dp"

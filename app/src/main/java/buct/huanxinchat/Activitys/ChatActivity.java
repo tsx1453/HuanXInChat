@@ -29,6 +29,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,6 +56,7 @@ import buct.huanxinchat.R;
 import buct.huanxinchat.Utils.MediaManager;
 import buct.huanxinchat.Utils.SharedPreferenceUtil;
 import buct.huanxinchat.Views.AudioRecoderButton;
+import buct.huanxinchat.Views.RecyclerViewWithContextMenu;
 
 public class ChatActivity extends BaseActivity {
 
@@ -62,7 +64,7 @@ public class ChatActivity extends BaseActivity {
     private String chatUserId;
     private EditText editText;
     private Button sendBtn;
-    private RecyclerView recyclerView;
+    private RecyclerViewWithContextMenu recyclerView;
     private EMConversation conversation;
     private boolean hasContext = false;
     private ChatRecyclerAdapter adapter;
@@ -374,6 +376,7 @@ public class ChatActivity extends BaseActivity {
         adapter.setRecyclerView(recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+        registerForContextMenu(recyclerView);
     }
 
     private void initData(Intent intent) {
@@ -539,5 +542,28 @@ public class ChatActivity extends BaseActivity {
     public void onBackPressed() {
         MediaManager.pause();
         super.onBackPressed();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add(1, 1, 1, "复制");
+        menu.add(1, 2, 1, "删除");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        RecyclerViewWithContextMenu.RecyclerViewContextInfo info = (RecyclerViewWithContextMenu.RecyclerViewContextInfo)item.getMenuInfo();
+        if (info!=null && info.getPosition()!=-1){
+            switch (item.getItemId()){
+                case 1:
+                    adapter.copy(info.getPosition());
+                    break;
+                case 2:
+                    adapter.delete(info.getPosition());
+                    break;
+            }
+        }
+        return super.onContextItemSelected(item);
     }
 }

@@ -42,5 +42,10 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:imeFullscreenBackground">@drawable/dialog_black_background</item>
     </style>
+    
+    <style name="Theme_diaLogAnimator">
+        <item name="android:windowEnterAnimation">@anim/dialog_show_animation</item>
+        <item name="android:windowExitAnimation">@anim/dialog_hide_animation</item>
+    </style>
 
 </resources>

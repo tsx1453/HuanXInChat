@@ -25,7 +25,7 @@ public class PictureDialog {
     }
 
     public void show(String path) {
-        dialog = new Dialog(mContext, R.style.Theme_PicDialog);
+        dialog = new Dialog(mContext, R.style.Theme_AppCompat_DayNight_Dialog);
         image = new ImageView(mContext);
         DisplayMetrics metrics = new DisplayMetrics();
         WindowManager windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
@@ -44,8 +44,10 @@ public class PictureDialog {
                 }
             }
         });
+        dialog.setCanceledOnTouchOutside(true);
         dialog.setCancelable(true);
         dialog.setContentView(image);
+        dialog.getWindow().setWindowAnimations(R.style.Theme_diaLogAnimator);
         dialog.show();
     }
 }

@@ -1,5 +1,7 @@
 package buct.huanxinchat.Adapter;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -107,6 +109,9 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public int getItemViewType(int position) {
+        if (position < 10) {
+            loadData();
+        }
         if (position == 0 && isNewConversation == false) {
             return TYPE_MORE;
         }
@@ -237,7 +242,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         holder.loadImg.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 200));
         holder.loadImg.setGravity(Gravity.CENTER);
 //        holder.loadImg.setText("loading...");
-        loadData();
+//        loadData();
     }
 
     private class VoiceViewHolder extends RecyclerView.ViewHolder {
@@ -272,14 +277,20 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (flag) {
             holder.left.setVisibility(View.GONE);
             holder.timeRight.setText(String.valueOf(length));
-            setVoiceClickEvent(holder.right, body, true,holder.rightContent);
-            holder.rightContent.getLayoutParams().width = length * 100 > 800 ? 800 : length * 100;
+            setVoiceClickEvent(holder.right, body, true, holder.rightContent);
+            int l = length * 100 > 800 ? 800 : length * 100;
+//            if (holder.rightContent.getLayoutParams().width != l) {
+//                holder.rightContent.getLayoutParams().width = l;
+//            }
 //            Log.d("tsx-mylog", "ChatRecyclerAdapter->bindVoiceViewHolder: "+holder.rightContent.getWidth()+":"+holder.rightContent.getLayoutParams().width);
         } else {
             holder.right.setVisibility(View.GONE);
             holder.timeLeft.setText(String.valueOf(length));
-            setVoiceClickEvent(holder.left, body, false,holder.leftContent);
-            holder.leftContent.getLayoutParams().width = length * 100 > 800 ? 800 : length * 100;
+            setVoiceClickEvent(holder.left, body, false, holder.leftContent);
+//            int l = length * 100 > 800 ? 800 : length * 100;
+//            if (holder.leftContent.getLayoutParams().width != l) {
+//                holder.leftContent.getLayoutParams().width = l;
+//            }
         }
     }
 
@@ -293,7 +304,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 } else {
                     url = body.getRemoteUrl();
                 }
-                final AlphaAnimation alphaAnimation = new AlphaAnimation(1,0.3f);
+                final AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0.3f);
                 alphaAnimation.setDuration(500);
                 alphaAnimation.setRepeatCount(-1);
                 alphaAnimation.setRepeatMode(Animation.REVERSE);
@@ -362,7 +373,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     @Override
                     public void run() {
                         int size = messages.size();
-                        messages.addAll(1, conversation.loadMoreMsgFromDB(message.getMsgId(), 20));
+                        messages.addAll(1, conversation.loadMoreMsgFromDB(message.getMsgId(), 1000));
                         if (messages.size() > size && loadingView != null) {
                             loadingView.setText("loading...");
                             noMoreData = false;
@@ -371,7 +382,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             noMoreData = true;
                             Log.d("tsxmylog", "run: nodata");
                         }
-                        ChatRecyclerAdapter.this.notifyDataSetChanged();
+                        ChatRecyclerAdapter.this.notifyItemInserted(messages.size());
                         if (scroll) {
                             recyclerView.scrollToPosition(getItemCount() - 1);
                         }
@@ -395,5 +406,25 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public void setRecyclerView(RecyclerView recyclerView) {
         this.recyclerView = recyclerView;
+    }
+
+    public void copy(int position) {
+        if (getItemViewType(position) == TYPE_TXT) {
+            ClipboardManager clipboardManager = (ClipboardManager)mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboardManager.setPrimaryClip(ClipData.newPlainText("lable",((EMTextMessageBody) messages.get(position).getBody()).getMessage()));
+        }
+    }
+
+    public void delete(int position){
+        final String id = messages.get(position).getMsgId();
+        messages.remove(position);
+        this.notifyItemRemoved(position);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+//                conversation = EMClient.getInstance().chatManager().getConversation(username, EMConversation.EMConversationType.Chat, true);
+                conversation.removeMessage(id);
+            }
+        });
     }
 }
