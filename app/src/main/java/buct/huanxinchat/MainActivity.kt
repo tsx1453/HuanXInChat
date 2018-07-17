@@ -1,5 +1,7 @@
 package buct.huanxinchat
 
+//import buct.huanxinchat.Adapter.ContractRecyclerViewAdapter
+//import buct.huanxinchat.Fragments.ContractFragment
 import android.Manifest
 import android.app.AlertDialog
 import android.app.Dialog
@@ -8,11 +10,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
-import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
@@ -21,11 +21,11 @@ import android.widget.EditText
 import android.widget.ImageView
 import buct.huanxinchat.Activitys.BaseActivity
 import buct.huanxinchat.Adapter.ContractRecyclerViewAdapter
-//import buct.huanxinchat.Adapter.ContractRecyclerViewAdapter
-//import buct.huanxinchat.Fragments.ContractFragment
 import buct.huanxinchat.Utils.QRCodeUtil
 import com.google.zxing.activity.CaptureActivity
+import com.hyphenate.EMCallBack
 import com.hyphenate.chat.EMClient
+import kotlinx.android.synthetic.main.fragment_contract.*
 
 class MainActivity : BaseActivity(), MainActivityConstract.View {
 
@@ -52,7 +52,7 @@ class MainActivity : BaseActivity(), MainActivityConstract.View {
         qrCodeShow = findViewById<Button>(R.id.qr_code_show)
         recyclerView!!.setLayoutManager(LinearLayoutManager(this))
         recyclerView!!.adapter = ContractRecyclerViewAdapter(this)
-        recyclerView!!.layoutAnimation = AnimationUtils.loadLayoutAnimation(this,R.anim.layout_falldown)
+        recyclerView!!.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_falldown)
         qrCodeShow!!.setOnClickListener(View.OnClickListener {
             val bitmap = QRCodeUtil.createQRCodeBitmap(EMClient.getInstance().currentUser, 600, 600)
             val dialog = Dialog(this, R.style.Theme_PicDialog)
@@ -62,6 +62,7 @@ class MainActivity : BaseActivity(), MainActivityConstract.View {
             imageView.setOnClickListener { dialog.dismiss() }
             dialog.setContentView(imageView)
             dialog.setCancelable(true)
+            dialog.setCanceledOnTouchOutside(true)
             dialog.show()
         })
         qrCodeScan!!.setOnClickListener(View.OnClickListener {
@@ -70,10 +71,32 @@ class MainActivity : BaseActivity(), MainActivityConstract.View {
             val intent = Intent(this, CaptureActivity::class.java)
             startActivityForResult(intent, 99)
         })
+        logout.setOnClickListener(View.OnClickListener {
+            AlertDialog.Builder(this)
+                    .setTitle("注意！")
+                    .setMessage("是否需要登出？")
+                    .setNegativeButton("是") { dialog: DialogInterface?, which: Int ->
+                        EMClient.getInstance().logout(true, object : EMCallBack {
+                            override fun onSuccess() {
+                                sendBroadcast(Intent("logout_huanxin"))
+                                finish()
+                            }
+
+                            override fun onError(code: Int, error: String) {
+
+                            }
+
+                            override fun onProgress(progress: Int, status: String) {
+
+                            }
+                        })
+                    }
+                    .create().show()
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.d("tsx", requestCode.toString() + ":" + resultCode.toString())
+//        Log.d("tsx", requestCode.toString() + ":" + resultCode.toString())
         if (resultCode == 161) { //RESULT_OK = -1
             val bundle = data!!.getExtras()
             val scanResult = bundle!!.getString("qr_scan_result")

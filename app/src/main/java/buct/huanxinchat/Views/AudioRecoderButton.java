@@ -48,8 +48,8 @@ public class AudioRecoderButton extends AppCompatButton implements AudioManager.
         File file = new File(dir);
         if (!file.exists()){
             try {
-                file.createNewFile();
-            } catch (IOException e) {
+                file.mkdirs();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

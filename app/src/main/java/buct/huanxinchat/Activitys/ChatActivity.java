@@ -393,7 +393,7 @@ public class ChatActivity extends BaseActivity {
 
     private void showMoreArea() {
         roateMoreBtn(0, 45);
-        moreAreaViewHeight(0, 400);
+        moreAreaViewHeight(0, 600);
     }
 
     private void initRecycler() {
@@ -406,6 +406,7 @@ public class ChatActivity extends BaseActivity {
 
     private void initData(Intent intent) {
         chatUserId = intent.getStringExtra(CHAT_EXTRA_USER_ID);
+        setTitle(chatUserId);
     }
 
     private void openAlbum(int requestId) {

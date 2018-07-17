@@ -98,7 +98,7 @@ public class ContractRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             view = itemView;
             imageView = itemView.findViewById(R.id.user_img);
             userId = itemView.findViewById(R.id.user_id);
-            userNickName = itemView.findViewById(R.id.user_nick_name);
+//            userNickName = itemView.findViewById(R.id.user_nick_name);
         }
     }
 }

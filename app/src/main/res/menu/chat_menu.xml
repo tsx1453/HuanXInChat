@@ -18,7 +18,7 @@
         android:icon="@drawable/ic_person_outline_black_24dp"/>
 
     <item android:id="@+id/chat_menu_auto_bg"
-        android:title="@string/autobg_on"
+        android:title="@string/autobg_off"
         android:orderInCategory="888"/>
 
 </menu>

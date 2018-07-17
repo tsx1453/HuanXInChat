@@ -46,6 +46,7 @@ public class LaunchActivity extends AppCompatActivity {
                 .load("http://www.nanbaolongbao.com/advertisement.png")
                 .placeholder(R.drawable.launch)
                 .error(R.drawable.launch)
+                .skipMemoryCache(true)
                 .into(imageView);
         button.setOnClickListener(new View.OnClickListener() {
             @Override

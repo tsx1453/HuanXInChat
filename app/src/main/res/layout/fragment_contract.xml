@@ -1,44 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:fitsSystemWindows="true">
 
     <android.support.v7.widget.RecyclerView
-        android:fitsSystemWindows="true"
+        android:id="@+id/contract_recycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
 
         android:layout_marginBottom="50dp"
-        android:id="@+id/contract_recycler"
+        android:fitsSystemWindows="true"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
+        android:id="@+id/bottom"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:orientation="horizontal"
-        android:id="@+id/bottom"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
 
         <Button
+            android:id="@+id/qr_code_show"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="二维码"
-            android:id="@+id/qr_code_show"/>
+            android:text="二维码" />
 
         <Button
+            android:id="@+id/qr_scan"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="扫描"
-            android:id="@+id/qr_scan"/>
+            android:text="扫描" />
+
+        <Button
+            android:id="@+id/logout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="登出"
+            android:textColor="#ff0000" />
 
     </LinearLayout>
 
