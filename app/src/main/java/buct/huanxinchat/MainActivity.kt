@@ -11,6 +11,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -58,6 +59,7 @@ class MainActivity : BaseActivity(), MainActivityConstract.View {
         qrCodeShow = findViewById<Button>(R.id.qr_code_show)
         recyclerView!!.setLayoutManager(LinearLayoutManager(this))
         recyclerView!!.adapter = ContractRecyclerViewAdapter(this)
+        recyclerView!!.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         recyclerView!!.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_falldown)
         qrCodeShow!!.setOnClickListener(View.OnClickListener {
             val bitmap = QRCodeUtil.createQRCodeBitmap(EMClient.getInstance().currentUser, 600, 600)
@@ -71,7 +73,7 @@ class MainActivity : BaseActivity(), MainActivityConstract.View {
             dialog.setContentView(imageView)
             dialog.setCancelable(true)
             dialog.setCanceledOnTouchOutside(true)
-            dialog.setOnDismissListener{
+            dialog.setOnDismissListener {
                 initView()
             }
             dialog.show()
