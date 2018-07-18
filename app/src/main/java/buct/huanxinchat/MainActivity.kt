@@ -13,17 +13,21 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 import buct.huanxinchat.Activitys.BaseActivity
 import buct.huanxinchat.Adapter.ContractRecyclerViewAdapter
 import buct.huanxinchat.Utils.QRCodeUtil
 import com.bumptech.glide.Glide
 import com.google.zxing.activity.CaptureActivity
+import com.google.zxing.client.android.MNScanManager
+import com.google.zxing.client.android.other.MNScanCallback
 import com.hyphenate.EMCallBack
 import com.hyphenate.chat.EMClient
 import kotlinx.android.synthetic.main.fragment_contract.*
@@ -74,9 +78,40 @@ class MainActivity : BaseActivity(), MainActivityConstract.View {
         })
         qrCodeScan!!.setOnClickListener(View.OnClickListener {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-                run { ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 1) }
-            val intent = Intent(this, CaptureActivity::class.java)
-            startActivityForResult(intent, 99)
+                run { ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE), 1) }
+//            val intent = Intent(this, CaptureActivity::class.java)
+//            startActivityForResult(intent, 99)
+            MNScanManager.startScan(this, MNScanCallback { i, intent ->
+                Log.d("cam",i.toString())
+                if(i == MNScanManager.RESULT_SUCCESS){
+                    var scanResult = intent.getStringExtra(MNScanManager.INTENT_KEY_RESULT_SUCCESS)
+                    Log.d("cam",scanResult)
+                    val text = EditText(this)
+                    if (scanResult.equals(EMClient.getInstance().currentUser)) {
+
+                    }
+                    AlertDialog.Builder(this)
+                            .setTitle("是否添加好友?")
+                            .setMessage("添加" + scanResult + "为好友")
+//                            .setView(text)
+                            .setNegativeButton("是") { dialogInterface, i ->
+                                Thread(Runnable {
+                                    EMClient.getInstance().contactManager().addContact(scanResult, text.text.toString());
+                                }).start()
+                                initView()
+                            }
+                            .setPositiveButton("否", null)
+                            .create().show()
+                }
+
+                if(i == MNScanManager.RESULT_CANCLE){
+                    Toast.makeText(this,"Scan error!",Toast.LENGTH_SHORT)
+                }
+
+                if(i == MNScanManager.RESULT_FAIL){
+
+                }
+            })
         })
         logout.setOnClickListener(View.OnClickListener {
             AlertDialog.Builder(this)
@@ -102,28 +137,28 @@ class MainActivity : BaseActivity(), MainActivityConstract.View {
         })
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        Log.d("tsx", requestCode.toString() + ":" + resultCode.toString())
-        if (resultCode == 161) { //RESULT_OK = -1
-            val bundle = data!!.getExtras()
-            val scanResult = bundle!!.getString("qr_scan_result")
-//            Log.d("tsx-mylog", "ContractFragment->onActivityResult: " + scanResult)
-            val text = EditText(this)
-            if (scanResult.equals(EMClient.getInstance().currentUser)) {
-                return
-            }
-            AlertDialog.Builder(this)
-                    .setTitle("是否添加好友?")
-                    .setMessage("添加" + scanResult + "为好友")
-                    .setView(text)
-                    .setNegativeButton("是") { dialogInterface, i ->
-                        Thread(Runnable {
-                            EMClient.getInstance().contactManager().addContact(scanResult, text.text.toString());
-                        }).start()
-                        initView()
-                    }
-                    .setPositiveButton("否", null)
-                    .create().show()
-        }
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+////        Log.d("tsx", requestCode.toString() + ":" + resultCode.toString())
+//        if (resultCode == 161) { //RESULT_OK = -1
+//            val bundle = data!!.getExtras()
+//            val scanResult = bundle!!.getString("qr_scan_result")
+////            Log.d("tsx-mylog", "ContractFragment->onActivityResult: " + scanResult)
+//            val text = EditText(this)
+//            if (scanResult.equals(EMClient.getInstance().currentUser)) {
+//                return
+//            }
+//            AlertDialog.Builder(this)
+//                    .setTitle("是否添加好友?")
+//                    .setMessage("添加" + scanResult + "为好友")
+//                    .setView(text)
+//                    .setNegativeButton("是") { dialogInterface, i ->
+//                        Thread(Runnable {
+//                            EMClient.getInstance().contactManager().addContact(scanResult, text.text.toString());
+//                        }).start()
+//                        initView()
+//                    }
+//                    .setPositiveButton("否", null)
+//                    .create().show()
+//        }
+//    }
 }
