@@ -43,9 +43,9 @@ public class LaunchActivity extends AppCompatActivity {
             }
         }, 1000, 1000);
         Glide.with(this)
-                .load("http://www.nanbaolongbao.com/advertisement.png")
-                .placeholder(R.drawable.launch)
-                .error(R.drawable.launch)
+                .load("http://www.nanbaolongbao.com/advertisement1.jpg")
+                .placeholder(R.drawable.advertisement)
+                .error(R.drawable.advertisement)
                 .skipMemoryCache(true)
                 .into(imageView);
         button.setOnClickListener(new View.OnClickListener() {

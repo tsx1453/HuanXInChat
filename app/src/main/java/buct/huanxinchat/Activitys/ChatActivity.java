@@ -124,7 +124,8 @@ public class ChatActivity extends BaseActivity {
         hasBackGround = true;
         Glide.with(this)
                 .load("http://www.nanbaolongbao.com/background.png")
-                .placeholder(null)
+                .placeholder(R.drawable.advertisement)
+                .error(R.drawable.advertisement)
                 .into(backGround);
     }
 

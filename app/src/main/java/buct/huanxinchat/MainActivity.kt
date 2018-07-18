@@ -22,6 +22,7 @@ import android.widget.ImageView
 import buct.huanxinchat.Activitys.BaseActivity
 import buct.huanxinchat.Adapter.ContractRecyclerViewAdapter
 import buct.huanxinchat.Utils.QRCodeUtil
+import com.bumptech.glide.Glide
 import com.google.zxing.activity.CaptureActivity
 import com.hyphenate.EMCallBack
 import com.hyphenate.chat.EMClient
@@ -43,6 +44,7 @@ class MainActivity : BaseActivity(), MainActivityConstract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fragment_contract)
+        title = "VenusChat" + "    |    " + EMClient.getInstance().currentUser
         initView()
     }
 
@@ -59,10 +61,15 @@ class MainActivity : BaseActivity(), MainActivityConstract.View {
             val imageView = ImageView(this)
             imageView.layoutParams = ViewGroup.LayoutParams(500, 500)
             imageView.setImageBitmap(bitmap)
-            imageView.setOnClickListener { dialog.dismiss() }
+            imageView.setOnClickListener {
+                dialog.dismiss()
+            }
             dialog.setContentView(imageView)
             dialog.setCancelable(true)
             dialog.setCanceledOnTouchOutside(true)
+            dialog.setOnDismissListener{
+                initView()
+            }
             dialog.show()
         })
         qrCodeScan!!.setOnClickListener(View.OnClickListener {
@@ -113,6 +120,7 @@ class MainActivity : BaseActivity(), MainActivityConstract.View {
                         Thread(Runnable {
                             EMClient.getInstance().contactManager().addContact(scanResult, text.text.toString());
                         }).start()
+                        initView()
                     }
                     .setPositiveButton("否", null)
                     .create().show()
